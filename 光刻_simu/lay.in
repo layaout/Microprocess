@@ -1,0 +1,198 @@
+go athena
+#定义网格：在0.6μm*0.8μm的区域内创建非均匀网络。
+line x loc=0.00 spac=0.10 
+line x loc=0.05 spac=0.01
+line x loc=0.3 spac=0.01
+line x loc=0.5 spac=0.01
+line x loc=0.7 spac=0.01
+line x loc=1.2 spac=0.01
+line x loc=1.3 spac=0.10
+line x loc=1.5 spac=0.01
+line x loc=1.8 spac=0.01
+line x loc=2 spac=0.01
+line x loc=2.2 spac=0.01
+line x loc=2.55 spac=0.01
+line x loc=2.6 spac=0.10
+#
+line y loc = -0.2  spac=0.008
+line y loc = 0.00  spac=0.008 
+line y loc = 0.2   spac=0.01
+line y loc = 0.5   spac=0.05 
+line y loc = 0.8   spac=0.15
+
+
+#step 1
+#初始化衬底：背景杂质是硼Boron，背景浓度为1.0*1014原子数/3（见fig001）
+init c.boron=1e14 orientation=100 two.d
+struct outfile=fig001.str
+tonyplot fig001.str -set doping.set -mtitle "Mesh 1"
+#栅极氧化：通过湿氧热氧化在硅表面生成栅极氧化层，条件：1Pa，950℃，湿氧，11min。（见fig002）
+diffus time=11 temp=950 weto2
+#第一层光刻
+deposit photoresist  thick=0.5 
+#定义刻蚀的具体位置
+etch        photo start x=0.15  y=-6
+etch        continue    x=0.15  y=0
+etch        continue    x=1   y=0 
+etch        done        x=1   y=-6
+
+#第一层刻蚀并去胶（见fig004）
+etch oxide thick=0.1
+strip
+struct outfile=fig002.str
+tonyplot fig002.str -set doping.set -mtitle "Mesh 1"
+
+#掺杂P衬底
+# 
+# 
+#implant phosphor dose=1.0e16 energy=10 tilt=0 rotation=0 crystal 
+
+diffus time=50 temp=950 nitro c.phosphor=3e16
+etch all oxide
+struct outfile=fig003.str
+tonyplot fig003.str -set doping.set -mtitle "Mesh 1"
+
+# step 2
+#栅极氧化：通过湿氧热氧化在硅表面生成栅极氧化层，条件：1Pa，950℃，湿氧，11min。（见fig002）
+#diffus time=11 temp=900 weto2
+deposit oxide thick=0.1 
+struct outfile=fig004.str
+tonyplot fig004.str -set doping.set -mtitle "Mesh 1"
+
+#第2层光刻，刻蚀右侧的N掺杂
+deposit photoresist  thick=0.5 
+
+etch        photo start x=1.7   y=-6
+etch        continue    x=1.7   y=0.5
+etch        continue    x=1.8     y=0.5 
+etch        done        x=1.8     y=-0.6
+
+etch        photo start x=2.2   y=-6
+etch        continue    x=2.2   y=0.5
+etch        continue    x=2.3     y=0.5 
+etch        done        x=2.3     y=-6
+
+#第2层刻蚀并去胶
+etch oxide thick=0.1
+strip
+struct outfile=fig005.str
+tonyplot fig005.str -set doping.set -mtitle "Mesh 1"
+#掺杂右侧P原子和P玻璃刻蚀
+# 
+
+diffus time=40 temp=950 nitro c.phosphor=2e16
+etch all oxide
+struct outfile=fig006.str
+tonyplot fig006.str -set doping.set -mtitle "Mesh 1"
+
+#step 3
+##栅极氧化：通过湿氧热氧化在硅表面生成栅极氧化层，条件：1Pa，950℃，湿氧，11min。
+#diffus time=11 temp=950 weto2
+# 
+deposit oxide thick=0.1 
+
+#第3层光刻
+deposit photoresist  thick=0.5 
+#定义刻蚀的具体位置
+etch     photo start    x=0.3   y=-6
+etch     continue       x=0.3   y=0.5
+etch     continue       x=0.4   y=0.5
+etch     done           x=0.4   y=-0.6
+
+etch     photo start    x=0.7   y=-6
+etch     continue       x=0.7   y=0.5
+etch     continue       x=0.8   y=0.5
+etch     done           x=0.8   y=-6
+
+#第2层刻蚀并去胶
+etch oxide thick=0.1
+strip
+
+#掺杂左侧 B 原子和 B 玻璃刻蚀
+# 
+diffus time=50 temp=950 nitro c.boron=6e16
+etch all oxide
+struct outfile=fig007.str
+tonyplot fig007.str -set doping.set -mtitle "Mesh 1"
+
+#step 4  铺一层金属
+deposit oxide thick=0.1 
+
+deposit photoresist  thick=0.125
+etch    photo start x=0.305 y=-22.5
+etch     continue   x=0.305 y=0.5
+etch     continue   x=0.385 y=0.5 
+etch     done       x=0.385 y=-22.5
+
+etch    photo start x=0.705 y=-22.5
+etch     continue   x=0.705 y=0.5
+etch     continue   x=0.785 y=0.5 
+etch     done       x=0.785 y=-22.5
+
+etch    photo start x=1.7   y=-22.5
+etch     continue   x=1.7   y=0.5
+etch     continue   x=1.795 y=0.5 
+etch     done       x=1.795 y=-22.5
+
+etch    photo start x=2.215 y=-22.5
+etch     continue   x=2.215 y=0.5
+etch     continue   x=2.285 y=0.5 
+etch     done       x=2.285 y=-22.5
+
+etch    oxide       thick=0.125
+strip
+struct outfile=fig008.str
+tonyplot fig008.str -set doping.set -mtitle "Mesh 1"
+
+
+# step 5 删除一些金属
+deposit alumin thick=0.1 divisions=2
+struct outfile=fig009.str
+tonyplot fig009.str -set doping.set -mtitle "Mesh 1"
+
+deposit     photoresist     thick=0.1
+etch        photo start     x=0         y=-20
+etch        continue        x=0         y=0.5
+etch        continue        x=0.275     y=0.5
+etch        done            x=0.275     y=-20
+
+etch        photo start     x=0.425     y=-20
+etch        continue        x=0.425     y=0.5
+etch        continue        x=0.5     y=0.5 
+etch        done            x=0.5     y=-20
+
+etch        photo start     x=0.6    y=-20
+etch        continue        x=0.6     y=0.5
+etch        continue        x=0.675     y=0.5 
+etch        done            x=0.675     y=-20
+
+etch        photo start     x=0.825     y=-20
+etch        continue        x=0.825     y=0.5
+etch        continue        x=1.675     y=0.5 
+etch        done            x=1.675     y=-20
+
+etch        photo start     x=1.825     y=-20
+etch        continue        x=1.825     y=0.5
+etch        continue        x=1.925     y=0.5 
+etch        done            x=1.925     y=-20
+
+etch        photo start     x=2.1     y=-20
+etch        continue        x=2.1     y=0.5
+etch        continue        x=2.175     y=0.5 
+etch        done            x=2.175     y=-20
+
+etch        photo start     x=2.325     y=-20
+etch        continue        x=2.325     y=0.5
+etch        continue        x=2.6     y=0.5 
+etch        done            x=2.6     y=-20
+
+
+# step 6 刻蚀铝线
+etch alumin thick=0.1
+strip
+
+duffuse time=30 temperature=1000
+struct outfile=fig009.str
+tonyplot fig009.str -set doping.set -mtitle "Mesh 1"
+
+quit
